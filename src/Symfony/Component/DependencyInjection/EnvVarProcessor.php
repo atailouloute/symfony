@@ -14,22 +14,23 @@ namespace Symfony\Component\DependencyInjection;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
 class EnvVarProcessor implements EnvVarProcessorInterface
 {
-    private $container;
+    private $parameterBag;
     private $loaders;
     private $loadedVars = [];
 
     /**
      * @param EnvVarLoaderInterface[] $loaders
      */
-    public function __construct(ContainerInterface $container, \Traversable $loaders = null)
+    public function __construct(ParameterBagInterface $parameterBag, \Traversable $loaders = null)
     {
-        $this->container = $container;
+        $this->parameterBag = $parameterBag;
         $this->loaders = $loaders ?? new \ArrayIterator();
     }
 
@@ -93,7 +94,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             $next = substr($name, $i + 1);
             $default = substr($name, 0, $i);
 
-            if ('' !== $default && !$this->container->hasParameter($default)) {
+            if ('' !== $default && !$this->parameterBag->has($default)) {
                 throw new RuntimeException(sprintf('Invalid env fallback in "default:%s": parameter "%s" not found.', $name, $default));
             }
 
@@ -107,7 +108,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                 // no-op
             }
 
-            return '' === $default ? null : $this->container->getParameter($default);
+            return '' === $default ? null : $this->parameterBag->get($default);
         }
 
         if ('file' === $prefix || 'require' === $prefix) {
@@ -167,11 +168,11 @@ class EnvVarProcessor implements EnvVarProcessorInterface
             }
 
             if (false === $env || null === $env) {
-                if (!$this->container->hasParameter("env($name)")) {
+                if (!$this->parameterBag->has("env($name)")) {
                     throw new EnvNotFoundException(sprintf('Environment variable not found: "%s".', $name));
                 }
 
-                $env = $this->container->getParameter("env($name)");
+                $env = $this->parameterBag->get("env($name)");
             }
         }
 
@@ -273,7 +274,7 @@ class EnvVarProcessor implements EnvVarProcessorInterface
                 if (!isset($match[1])) {
                     return '%';
                 }
-                $value = $this->container->getParameter($match[1]);
+                $value = $this->parameterBag->get($match[1]);
                 if (!is_scalar($value)) {
                     throw new RuntimeException(sprintf('Parameter "%s" found when resolving env var "%s" must be scalar, "%s" given.', $match[1], $name, \gettype($value)));
                 }

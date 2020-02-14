@@ -68,6 +68,7 @@
             <argument type="service" id="parameter_bag" on-invalid="ignore" />
             <argument type="service" id="logger" on-invalid="ignore" />
             <argument>%kernel.default_locale%</argument>
+            <argument type="service" id="Symfony\Component\Routing\Matcher\EnvVarResolverInterface" />
             <call method="setConfigCacheFactory">
                 <argument type="service" id="config_cache_factory" />
             </call>
@@ -114,6 +115,19 @@
 
         <service id="Symfony\Bundle\FrameworkBundle\Controller\TemplateController" public="true">
             <argument type="service" id="twig" on-invalid="ignore" />
+        </service>
+
+        <service id="Symfony\Bundle\FrameworkBundle\Routing\Matcher\EnvVarResolverAdapter" public="false">
+            <argument type="service" id="container.env_var_resolver" />
+        </service>
+
+        <service id="Symfony\Component\Routing\Matcher\EnvVarResolverInterface" alias="Symfony\Bundle\FrameworkBundle\Routing\Matcher\EnvVarResolverAdapter" />
+
+        <service id="Symfony\Component\Routing\Matcher\ExpressionLanguageProvider" public="false">
+            <tag name="routing.expression_language_provider" />
+            <call method="setEnvVarResolver">
+                <argument type="service" id="Symfony\Component\Routing\Matcher\EnvVarResolverInterface" on-invalid="ignore" />
+            </call>
         </service>
     </services>
 </container>

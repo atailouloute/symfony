@@ -23,9 +23,12 @@ class CompiledUrlMatcher extends UrlMatcher
 {
     use CompiledUrlMatcherTrait;
 
-    public function __construct(array $compiledRoutes, RequestContext $context)
+    private $envVarResolver;
+
+    public function __construct(array $compiledRoutes, RequestContext $context, ?EnvVarResolverInterface $envVarResolver = null)
     {
         $this->context = $context;
+        $this->envVarResolver = $envVarResolver;
         list($this->matchHost, $this->staticRoutes, $this->regexpList, $this->dynamicRoutes, $this->checkCondition) = $compiledRoutes;
     }
 }

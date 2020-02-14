@@ -26,6 +26,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Matcher\CompiledUrlMatcher;
 use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 use Symfony\Component\Routing\Matcher\Dumper\MatcherDumperInterface;
+use Symfony\Component\Routing\Matcher\EnvVarResolverInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 
@@ -95,9 +96,14 @@ class Router implements RouterInterface, RequestMatcherInterface
     private static $cache = [];
 
     /**
+     * @var EnvVarResolverInterface
+     */
+    protected $envVarResolver;
+
+    /**
      * @param mixed $resource The main resource to load
      */
-    public function __construct(LoaderInterface $loader, $resource, array $options = [], RequestContext $context = null, LoggerInterface $logger = null, string $defaultLocale = null)
+    public function __construct(LoaderInterface $loader, $resource, array $options = [], RequestContext $context = null, LoggerInterface $logger = null, string $defaultLocale = null, EnvVarResolverInterface $envVarResolver)
     {
         $this->loader = $loader;
         $this->resource = $resource;
@@ -105,6 +111,7 @@ class Router implements RouterInterface, RequestMatcherInterface
         $this->context = $context ?: new RequestContext();
         $this->setOptions($options);
         $this->defaultLocale = $defaultLocale;
+        $this->envVarResolver = $envVarResolver;
     }
 
     /**
@@ -274,7 +281,7 @@ class Router implements RouterInterface, RequestMatcherInterface
             if ($compiled) {
                 $routes = (new CompiledUrlMatcherDumper($routes))->getCompiledRoutes();
             }
-            $this->matcher = new $this->options['matcher_class']($routes, $this->context);
+            $this->matcher = new $this->options['matcher_class']($routes, $this->context, $this->envVarResolver);
             if (method_exists($this->matcher, 'addExpressionLanguageProvider')) {
                 foreach ($this->expressionLanguageProviders as $provider) {
                     $this->matcher->addExpressionLanguageProvider($provider);
@@ -297,7 +304,7 @@ class Router implements RouterInterface, RequestMatcherInterface
             }
         );
 
-        return $this->matcher = new $this->options['matcher_class'](self::getCompiledRoutes($cache->getPath()), $this->context);
+        return $this->matcher = new $this->options['matcher_class'](self::getCompiledRoutes($cache->getPath()), $this->context, $this->envVarResolver);
     }
 
     /**

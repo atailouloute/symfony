@@ -115,7 +115,7 @@ EOF;
             }
 
             $checkConditionCode = <<<EOF
-    static function (\$condition, \$context, \$request) { // \$checkCondition
+    static function (\$condition, \$context, \$request, \$envVarResolver) { // \$checkCondition
         switch (\$condition) {
 {$this->indent(implode("\n", $conditions), 3)}
         }

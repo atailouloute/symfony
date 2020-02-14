@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Matcher;
 
+use Symfony\Component\DependencyInjection\EnvVarProcessor;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;

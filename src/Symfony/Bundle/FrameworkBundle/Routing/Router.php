@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainer
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
+use Symfony\Component\Routing\Matcher\EnvVarResolverInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Router as BaseRouter;
@@ -38,7 +39,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
     /**
      * @param mixed $resource The main resource to load
      */
-    public function __construct(ContainerInterface $container, $resource, array $options = [], RequestContext $context = null, ContainerInterface $parameters = null, LoggerInterface $logger = null, string $defaultLocale = null)
+    public function __construct(ContainerInterface $container, $resource, array $options = [], RequestContext $context = null, ContainerInterface $parameters = null, LoggerInterface $logger = null, string $defaultLocale = null, EnvVarResolverInterface $envVarResolver)
     {
         $this->container = $container;
         $this->resource = $resource;
@@ -55,6 +56,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
         }
 
         $this->defaultLocale = $defaultLocale;
+        $this->envVarResolver = $envVarResolver;
     }
 
     /**

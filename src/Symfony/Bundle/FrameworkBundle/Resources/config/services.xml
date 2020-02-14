@@ -120,7 +120,7 @@
 
         <service id="container.env_var_processor" class="Symfony\Component\DependencyInjection\EnvVarProcessor">
             <tag name="container.env_var_processor" />
-            <argument type="service" id="service_container" />
+            <argument type="service" id="parameter_bag" />
             <argument type="tagged_iterator" tag="container.env_var_loader" />
         </service>
 
@@ -142,6 +142,11 @@
                     </argument>
                 </service>
             </argument>
+        </service>
+
+        <service id="container.env_var_resolver" class="Symfony\Component\DependencyInjection\EnvVarResolver" public="true">
+            <argument type="service" id="parameter_bag" />
+            <argument type="service" id="container.env_var_processors_locator" on-invalid="null" />
         </service>
     </services>
 </container>

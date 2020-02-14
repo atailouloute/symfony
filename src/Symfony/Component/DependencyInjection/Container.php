@@ -49,12 +49,9 @@ class Container implements ContainerInterface, ResetInterface
     protected $factories = [];
     protected $aliases = [];
     protected $loading = [];
-    protected $resolving = [];
     protected $syntheticIds = [];
 
-    private $envCache = [];
     private $compiled = false;
-    private $getEnv;
 
     public function __construct(ParameterBagInterface $parameterBag = null)
     {
@@ -368,48 +365,9 @@ class Container implements ContainerInterface, ResetInterface
         return require $file;
     }
 
-    /**
-     * Fetches a variable from the environment.
-     *
-     * @param string $name The name of the environment variable
-     *
-     * @return mixed The value to use for the provided environment variable name
-     *
-     * @throws EnvNotFoundException When the environment variable is not found and has no default value
-     */
     protected function getEnv($name)
     {
-        if (isset($this->resolving[$envName = "env($name)"])) {
-            throw new ParameterCircularReferenceException(array_keys($this->resolving));
-        }
-        if (isset($this->envCache[$name]) || \array_key_exists($name, $this->envCache)) {
-            return $this->envCache[$name];
-        }
-        if (!$this->has($id = 'container.env_var_processors_locator')) {
-            $this->set($id, new ServiceLocator([]));
-        }
-        if (!$this->getEnv) {
-            $this->getEnv = new \ReflectionMethod($this, __FUNCTION__);
-            $this->getEnv->setAccessible(true);
-            $this->getEnv = $this->getEnv->getClosure($this);
-        }
-        $processors = $this->get($id);
-
-        if (false !== $i = strpos($name, ':')) {
-            $prefix = substr($name, 0, $i);
-            $localName = substr($name, 1 + $i);
-        } else {
-            $prefix = 'string';
-            $localName = $name;
-        }
-        $processor = $processors->has($prefix) ? $processors->get($prefix) : new EnvVarProcessor($this);
-
-        $this->resolving[$envName] = true;
-        try {
-            return $this->envCache[$name] = $processor->getEnv($prefix, $localName, $this->getEnv);
-        } finally {
-            unset($this->resolving[$envName]);
-        }
+        return $this->get('container.env_var_resolver')->getEnv($name);
     }
 
     /**

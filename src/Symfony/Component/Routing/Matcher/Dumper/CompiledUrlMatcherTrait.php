@@ -14,6 +14,7 @@ namespace Symfony\Component\Routing\Matcher\Dumper;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Matcher\EnvVarResolver;
 use Symfony\Component\Routing\Matcher\RedirectableUrlMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 
@@ -88,7 +89,7 @@ trait CompiledUrlMatcherTrait
         $supportsRedirections = 'GET' === $canonicalMethod && $this instanceof RedirectableUrlMatcherInterface;
 
         foreach ($this->staticRoutes[$trimmedPathinfo] ?? [] as list($ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash, , $condition)) {
-            if ($condition && !($this->checkCondition)($condition, $context, 0 < $condition ? $request ?? $request = $this->request ?: $this->createRequest($pathinfo) : null)) {
+            if ($condition && !($this->checkCondition)($condition, $context, 0 < $condition ? $request ?? $request = $this->request ?: $this->createRequest($pathinfo) : null, $this->envVarResolver ?? null)) {
                 continue;
             }
 
