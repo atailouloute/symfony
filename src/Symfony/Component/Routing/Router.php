@@ -97,12 +97,13 @@ class Router implements RouterInterface, RequestMatcherInterface
     /**
      * @param mixed $resource The main resource to load
      */
-    public function __construct(LoaderInterface $loader, $resource, array $options = [], RequestContext $context = null, LoggerInterface $logger = null, string $defaultLocale = null)
+    public function __construct(LoaderInterface $loader, $resource, array $options = [], RequestContext $context = null, LoggerInterface $logger = null, string $defaultLocale = null, array $defaultParameters = [])
     {
         $this->loader = $loader;
         $this->resource = $resource;
         $this->logger = $logger;
         $this->context = $context ?: new RequestContext();
+        $this->context->addParameters($defaultParameters);
         $this->setOptions($options);
         $this->defaultLocale = $defaultLocale;
     }

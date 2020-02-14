@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Matcher\EnvVarResolverInterface;
 
 /**
  * Holds information about the current request.
@@ -265,6 +266,20 @@ class RequestContext
     public function setParameters(array $parameters)
     {
         $this->parameters = $parameters;
+
+        return $this;
+    }
+
+    /**
+     * Adds some parameters.
+     *
+     * @param array $parameters The parameters
+     *
+     * @return $this
+     */
+    public function addParameters(array $parameters)
+    {
+        $this->parameters = array_merge($parameters, $this->parameters);
 
         return $this;
     }
