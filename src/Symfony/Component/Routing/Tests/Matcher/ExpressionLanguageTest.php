@@ -21,7 +21,7 @@ class ExpressionLanguageTest extends TestCase
     private $context;
     private $expressionLanguage;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->context = new RequestContext();
         $this->context->setParameter('_functions', [
@@ -71,7 +71,7 @@ class ExpressionLanguageTest extends TestCase
         $this->assertSame($expected, $this->expressionLanguage->evaluate($expression, ['context' => $this->context]));
     }
 
-    public function evaluateProvider(): array
+    public function evaluateProvider(): iterable
     {
         return [
             ['env("APP_ENV")', 'test'],
