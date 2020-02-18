@@ -102,7 +102,7 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
         $def->setMethodCalls($parentDef->getMethodCalls());
         $def->setProperties($parentDef->getProperties());
         if ($parentDef->isDeprecated()) {
-            $def->setDeprecated(true, $parentDef->getDeprecationMessage('%service_id%'));
+            $def->setDeprecated(...array_values($parentDef->getDeprecation('%service_id%')));
         }
         $def->setFactory($parentDef->getFactory());
         $def->setConfigurator($parentDef->getConfigurator());
@@ -137,7 +137,11 @@ class ResolveChildDefinitionsPass extends AbstractRecursivePass
             $def->setLazy($definition->isLazy());
         }
         if (isset($changes['deprecated'])) {
-            $def->setDeprecated($definition->isDeprecated(), $definition->getDeprecationMessage('%service_id%'));
+            if ($definition->isDeprecated()) {
+                $def->setDeprecated(...array_values($definition->getDeprecation('%service_id%')));
+            } else {
+                $def->setDeprecated(false);
+            }
         }
         if (isset($changes['autowired'])) {
             $def->setAutowired($definition->isAutowired());

@@ -205,6 +205,10 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals(['decorated', 'decorated.pif-pouf', 5, ContainerInterface::IGNORE_ON_INVALID_REFERENCE], $services['decorator_service_with_name_and_priority_and_on_invalid']->getDecoratedService());
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Since symfony/dependency-injection 5.1: Not setting the attribute "package" of "deprecated" is deprecated.
+     */
     public function testDeprecatedAliases()
     {
         $container = new ContainerBuilder();

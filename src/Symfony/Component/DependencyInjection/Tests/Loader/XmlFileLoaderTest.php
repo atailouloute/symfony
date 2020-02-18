@@ -386,6 +386,10 @@ class XmlFileLoaderTest extends TestCase
         $loader->load('tag_with_empty_name.xml');
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the node "deprecated" is deprecated.
+     */
     public function testDeprecated()
     {
         $container = new ContainerBuilder();
@@ -401,6 +405,10 @@ class XmlFileLoaderTest extends TestCase
         $this->assertSame($message, $container->getDefinition('bar')->getDeprecationMessage('bar'));
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Since symfony/dependency-injection 5.1: Not setting the attribute "package" of the node "deprecated" is deprecated.
+     */
     public function testDeprecatedAliases()
     {
         $container = new ContainerBuilder();

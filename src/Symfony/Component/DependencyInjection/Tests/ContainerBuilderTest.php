@@ -307,6 +307,35 @@ class ContainerBuilderTest extends TestCase
         $builder->get('foobar');
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation Since symfony/dependency-injection 5.1: The "foobar" service alias is deprecated. You should stop using it, as it will be removed in the future.
+     */
+    public function testDeprecatedAliasWithPackageAndVersion()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'stdClass');
+
+        $alias = new Alias('foo');
+        $alias->setDeprecated('symfony/dependency-injection', '5.1', 'The "%alias_id%" service alias is deprecated. You should stop using it, as it will be removed in the future.');
+        $builder->setAlias('foobar', $alias);
+
+        $builder->get('foobar');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation Since symfony/dependency-injection 5.1: The "foo" service alias is deprecated. You should stop using it, as it will be removed in the future.
+     */
+    public function testDeprecatedServiceWithPackageAndVersion()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'stdClass')
+            ->setDeprecated('symfony/dependency-injection', '5.1', 'The "%service_id%" service alias is deprecated. You should stop using it, as it will be removed in the future.');
+
+        $builder->get('foo');
+    }
+
     public function testGetAliases()
     {
         $builder = new ContainerBuilder();
