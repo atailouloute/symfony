@@ -24,12 +24,21 @@ class GetAttrNode extends Node
     const METHOD_CALL = 2;
     const ARRAY_CALL = 3;
 
-    public function __construct(Node $node, Node $attribute, ArrayNode $arguments, int $type)
+    private $safeNavigation;
+
+    public function __construct(Node $node, Node $attribute, ArrayNode $arguments, int $type, bool $safeNavigation = false)
     {
         parent::__construct(
             ['node' => $node, 'attribute' => $attribute, 'arguments' => $arguments],
             ['type' => $type]
         );
+
+        $this->safeNavigation = $safeNavigation;
+    }
+
+    public function isSafeNavigationEnabled(): bool
+    {
+        return $this->safeNavigation;
     }
 
     public function compile(Compiler $compiler)
@@ -70,6 +79,9 @@ class GetAttrNode extends Node
             case self::PROPERTY_CALL:
                 $obj = $this->nodes['node']->evaluate($functions, $values);
                 if (!\is_object($obj)) {
+                    if ($this->safeNavigation) {
+                        return null;
+                    }
                     throw new \RuntimeException('Unable to get a property on a non-object.');
                 }
 
@@ -80,9 +92,15 @@ class GetAttrNode extends Node
             case self::METHOD_CALL:
                 $obj = $this->nodes['node']->evaluate($functions, $values);
                 if (!\is_object($obj)) {
+                    if ($this->safeNavigation) {
+                        return null;
+                    }
                     throw new \RuntimeException('Unable to get a property on a non-object.');
                 }
                 if (!\is_callable($toCall = [$obj, $this->nodes['attribute']->attributes['value']])) {
+                    if ($this->safeNavigation) {
+                        return null;
+                    }
                     throw new \RuntimeException(sprintf('Unable to call method "%s" of object "%s".', $this->nodes['attribute']->attributes['value'], \get_class($obj)));
                 }
 
@@ -91,6 +109,9 @@ class GetAttrNode extends Node
             case self::ARRAY_CALL:
                 $array = $this->nodes['node']->evaluate($functions, $values);
                 if (!\is_array($array) && !$array instanceof \ArrayAccess) {
+                    if ($this->safeNavigation) {
+                        return null;
+                    }
                     throw new \RuntimeException('Unable to get an item on a non-array.');
                 }
 
